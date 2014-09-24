@@ -16,27 +16,26 @@ install:
 script:
   - hlint . --ignore="Parse error"
   - cabal-1.18 configure --enable-tests --enable-benchmarks --enable-library-coverage -v2
-  - #cabal-1.18 build
+  - cabal-1.18 build
   - |
     if [ $GHCVER = "7.8.3" ]; then
-      #cabal-1.18 test --show-details=always
+      cabal-1.18 test --show-details=always
     else
-      #dist/build/run-cabal-test/run-cabal-test --cabal-name=cabal-1.18 --show-details=always
+      dist/build/run-cabal-test/run-cabal-test --cabal-name=cabal-1.18 --show-details=always
     fi
   - cabal-1.18 check
-#  - cabal-1.18 sdist
-#  - export SRC_TGZ=$(cabal-1.18 info . | awk '{print $2 ".tar.gz";exit}') ;
-#    (cd dist/;
-#    if [ -f "$SRC_TGZ" ]; then
-#      cabal-1.18 install "$SRC_TGZ";
-#    else
-#      echo "expected '$SRC_TGZ' not found";
-#      exit 1;
-#    fi)
+  - cabal-1.18 sdist
+  - export SRC_TGZ=$(cabal-1.18 info . | awk '{print $2 ".tar.gz";exit}') ;
+    (cd dist/;
+    if [ -f "$SRC_TGZ" ]; then
+      cabal-1.18 install "$SRC_TGZ";
+    else
+      echo "expected '$SRC_TGZ' not found";
+      exit 1;
+    fi)
 
-#after_script:
-#  - dist/build/codecov-haskell/codecov-haskell test-all --exclude-dir=test --display-report
-# codecov token: 452bc00b-7025-47a4-895f-47464d6aa7fa
+after_script:
+  - dist/build/codecov-haskell/codecov-haskell test-all --exclude-dir=test --dont-send --display-report --print-response
 
 notifications:
   webhooks:
