@@ -28,7 +28,7 @@ getUrlApiV1 = do
             return $ baseUrlApiV1 ++ "?" ++ idParamName ++ "=" ++ idParamValue ++ "&commit=" ++ commit ++ "&branch=" ++ branch
         _ -> error "Unsupported CI service."
     where ciEnvVars = [
-           ("TRAVIS", (("travis_job_id", "TRAVIS_JOB_ID"), "TRANVIS_COMMIT", "TRAVIS_BRANCH"))]
+           ("TRAVIS", (("travis_job_id", "TRAVIS_JOB_ID"), "TRAVIS_COMMIT", "TRAVIS_BRANCH"))]
 
 writeJson :: String -> Value -> IO ()
 writeJson filePath = BSL.writeFile filePath . encode
