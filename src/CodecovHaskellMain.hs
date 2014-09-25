@@ -30,9 +30,6 @@ getUrlApiV1 = do
     where ciEnvVars = [
            ("TRAVIS", (("travis_job_id", "TRAVIS_JOB_ID"), "TRAVIS_COMMIT", "TRAVIS_BRANCH"))]
 
-writeJson :: String -> Value -> IO ()
-writeJson filePath = BSL.writeFile filePath . encode
-
 getConfig :: CodecovHaskellArgs -> Maybe Config
 getConfig cha = case testSuites cha of
     []             -> Nothing
@@ -46,11 +43,9 @@ main = do
         Just config -> do
             codecovJson <- generateCodecovFromTix config
             when (displayReport cha) $ BSL.putStrLn $ encode codecovJson
-            let filePath = "coverage.json"
-            writeJson filePath codecovJson
             unless (dontSend cha) $ do
                 apiUrl <- getUrlApiV1
-                response <- postJson filePath apiUrl (printResponse cha)
+                response <- postJson codecovJson apiUrl (printResponse cha)
                 case response of
                     PostSuccess url totalCoverage -> do
                         putStrLn ("URL: " ++ url)

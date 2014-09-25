@@ -10,7 +10,7 @@
 --
 -- Functions for sending coverage report files over http.
 
-module Trace.Hpc.Codecov.Curl ( postJson, readCoverageResult, PostResult (..) ) where
+module Trace.Hpc.Codecov.Curl ( postJson, PostResult (..) ) where
 
 import           Control.Monad
 import           Data.Aeson
@@ -31,37 +31,18 @@ parseResponse r = case respCurlCode r of
               parseMaybe (.: fieldName) result
 
 httpPost :: String -> [HttpPost]
-httpPost path = [HttpPost "json_file" Nothing (ContentFile path) [] Nothing]
+httpPost jsonCoverage = [HttpPost "coverage" (Just "application/json") (ContentString jsonCoverage) [] Nothing]
 
--- | Send file content over HTTP using POST request
-postJson :: String        -- ^ target file
+-- | Send json coverage report over HTTP using POST request
+postJson :: String        -- ^ json coverage report
          -> URLString     -- ^ target url
-         -> Bool          -- ^ print json response if true
+         -> Bool          -- ^ print response body if true
          -> IO PostResult -- ^ POST request result
-postJson path url printResponse = do
+postJson jsonCoverage url printResponse = do
     h <- initialize
     setopt h (CurlVerbose True)
     setopt h (CurlURL url)
-    setopt h (CurlHttpPost $ httpPost path)
+    setopt h (CurlHttpPost $ httpPost jsonCoverage)
     r <- perform_with_response_ h
     when printResponse $ putStrLn $ respBody r
     return $ parseResponse r
-
--- | Extract the total coverage percentage value from codecov coverage result
---   page content.
---   The current implementation is kept as low level as possible in order not
---   to increase the library build time, by not relying on additional packages.
-extractCoverage :: String -> String
-extractCoverage = head . splitOn "<" . (!! 1) . splitOn prefix
-    where prefix = "div class='coverage'>\n<strong>"
-
--- | Read the coveraege result page from codecov.io
-readCoverageResult :: URLString         -- ^ target url
-                   -> Bool              -- ^ print json response if true
-                   -> IO (Maybe String) -- ^ coverage result
-readCoverageResult url printResponse = do
-    response <- curlGetString url []
-    when printResponse $ putStrLn $ snd response
-    return $ case response of
-        (CurlOK, body) -> Just $ extractCoverage body
-        _ -> Nothing
