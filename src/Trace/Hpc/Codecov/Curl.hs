@@ -30,9 +30,6 @@ parseResponse r = case respCurlCode r of
               result <- decode $ LBS.pack (respBody r)
               parseMaybe (.: fieldName) result
 
-httpPost :: String -> [HttpPost]
-httpPost jsonCoverage = [HttpPost "coverage" (Just "application/json") (ContentString jsonCoverage) [] Nothing]
-
 -- | Send json coverage report over HTTP using POST request
 postJson :: String        -- ^ json coverage report
          -> URLString     -- ^ target url
@@ -40,9 +37,11 @@ postJson :: String        -- ^ json coverage report
          -> IO PostResult -- ^ POST request result
 postJson jsonCoverage url printResponse = do
     h <- initialize
+	setopt h (CurlPost True)
     setopt h (CurlVerbose True)
     setopt h (CurlURL url)
-    setopt h (CurlHttpPost $ httpPost jsonCoverage)
+    setopt h (CurlHttpHeaders ["Content-Type: application/json"])
+    setopt h (CurlPostFields [jsonCoverage])
     r <- perform_with_response_ h
     when printResponse $ putStrLn $ respBody r
     return $ parseResponse r
