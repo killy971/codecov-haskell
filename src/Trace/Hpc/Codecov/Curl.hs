@@ -16,7 +16,6 @@ import           Control.Monad
 import           Data.Aeson
 import           Data.Aeson.Types (parseMaybe)
 import qualified Data.ByteString.Lazy.Char8 as LBS
-import           Data.List.Split
 import           Data.Maybe
 import           Network.Curl
 import           Trace.Hpc.Codecov.Types

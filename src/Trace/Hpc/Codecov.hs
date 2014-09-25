@@ -55,7 +55,7 @@ looseConverter = map $ \lix -> case lix of
     Irrelevant -> Null
 
 toSimpleCoverage :: LixConverter -> Int -> [CoverageEntry] -> SimpleCoverage
-toSimpleCoverage convert lineCount = convert . toLix lineCount
+toSimpleCoverage convert lineCount = (:) Null . convert . toLix lineCount
 
 getExprSource :: [String] -> MixEntry -> [String]
 getExprSource source (hpcPos, _) = subSubSeq startCol endCol subLines
