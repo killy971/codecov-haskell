@@ -45,7 +45,7 @@ main = do
             when (displayReport cha) $ BSL.putStrLn $ encode codecovJson
             unless (dontSend cha) $ do
                 apiUrl <- getUrlApiV1
-                response <- postJson codecovJson apiUrl (printResponse cha)
+                response <- postJson (BSL.unpack $ encode codecovJson) apiUrl (printResponse cha)
                 case response of
                     PostSuccess url totalCoverage -> do
                         putStrLn ("URL: " ++ url)
