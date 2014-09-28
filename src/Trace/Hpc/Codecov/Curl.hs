@@ -22,7 +22,7 @@ import           Trace.Hpc.Codecov.Types
 
 parseResponse :: CurlResponse -> PostResult
 parseResponse r = case respCurlCode r of
-    CurlOK -> PostSuccess (getField "url") ((show (getField "coverage" :: Integer)) ++ "%")
+    CurlOK -> PostSuccess (getField "url") (show (getField "coverage" :: Integer) ++ "%")
     _      -> PostFailure $ getField "message"
     where getField fieldName = fromJust $ mGetField fieldName
           mGetField fieldName = do
