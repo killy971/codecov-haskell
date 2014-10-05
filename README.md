@@ -36,7 +36,6 @@ This will prevent the build to fail because of hpc related reasons, which are us
 You may also experience some issues related to your project dependencies, which can be solved by using the `--avoid-reinstalls`/`--force-reinstalls` flags.</br>
 Another way to solve problems related dependencies is to install codecov-haskell in a sandbox, as in the example below:
 ```yaml
-after_script:
   - cabal sandbox init && cabal install codecov-haskell
   - .cabal-sandbox/bin/codecov-haskell [options] [test-suite-names]
 ```
