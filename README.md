@@ -110,7 +110,7 @@ An option will be added soon in order to allow specifying source folders to incl
 
 ## Expression level coverage
 
-Even though hpc supports expression level covereage, this version of codecov-haskell does not support it yet, but this feature will be implemented soon.
+Even though hpc supports expression level coverage, this version of codecov-haskell does not support it yet, but this feature will be implemented soon.
 Meanwhile, the hpc coverage information is converted into a line based report, in which a line can be: fully covered (green), partially covered (yellow) and not covered (red).
 
 # Contributing
