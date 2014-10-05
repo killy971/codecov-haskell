@@ -40,15 +40,8 @@ type CoverageValue = Value
 
 type LixConverter = Lix -> SimpleCoverage
 
-strictConverter :: LixConverter
-strictConverter = map $ \lix -> case lix of
-    Full       -> Number 1
-    Partial    -> Number 0
-    None       -> Number 0
-    Irrelevant -> Null
-
-looseConverter :: LixConverter
-looseConverter = map $ \lix -> case lix of
+defaultConverter :: LixConverter
+defaultConverter = map $ \lix -> case lix of
     Full       -> Number 1
     Partial    -> Bool True
     None       -> Number 0
@@ -115,6 +108,4 @@ generateCodecovFromTix config = do
     return $ toCodecovJson converter $ mergeCoverageData testSuitesCoverages
     where excludedDirPatterns = excludedDirs config
           testSuiteNames = testSuites config
-          converter = case coverageMode config of
-              StrictlyFullLines -> strictConverter
-              AllowPartialLines -> looseConverter
+          converter = defaultConverter

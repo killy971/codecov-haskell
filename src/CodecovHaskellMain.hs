@@ -33,7 +33,7 @@ getUrlApiV1 = do
 getConfig :: CodecovHaskellArgs -> Maybe Config
 getConfig cha = case testSuites cha of
     []             -> Nothing
-    testSuiteNames -> Just $ Config testSuiteNames (excludeDirs cha) (coverageMode cha)
+    testSuiteNames -> Just $ Config testSuiteNames (excludeDirs cha)
 
 main :: IO ()
 main = do

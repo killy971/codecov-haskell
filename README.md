@@ -79,7 +79,7 @@ codecov-haskell test1 test2
 #### --exclude-dir
 
 The `--exclude-dir` option allows to exclude source files located under a given directory from the coverage report.<br/>
-You can exclude source files located under the `test/` by using this option as in the following example:
+You can exclude source files located under the `test/` directory by using this option as in the following example:
 
 ```yaml
 codecov-haskell --exclude-dir=test [test-suite-names]
@@ -90,21 +90,6 @@ You can specify multiple excluded folders by using the following example syntax:
 ```yaml
 codecov-haskell --exclude-dir=test1 --exclude-dir=test2 [test-suite-names]
 ```
-
-#### --coverage-mode
-
-As Codecov doesn't support sub-line level coverage yet, codecov-haskell currently converts hpc coverage data into line based coverage data, which is the only format supported at the moment.
-The `--coverage-mode` option allows to configure how the coverage data is converted into Codecov format, based on your needs.<br/>
-Below are the two modes currently available, with an explanation of what the hit count values mean.
-
-`--coverage-mode=AllowPartialLines` (default):
-- `0` : the line is never hit,
-- `true` : the line is partially covered,
-- `1` : the line is fully covered.
-
-`--coverage-mode=StrictlyFullLines`:
-- `0` : the line is never hit or only partially covered,
-- `1` : the line is fully covered.
 
 #### --dont-send
 
@@ -118,9 +103,16 @@ This boolean option prints the raw json response received after posting the cove
 
 # Limitations
 
-Because of the way hpc works, coverage data is only generated for modules that are referenced directly or indirectly by the test suites.
+## Total coverage
 
+Because of the way hpc works, coverage data is only generated for modules that are referenced directly or indirectly by the test suites.
 As a result, the total package coverage computed by Codecov may be higher than what it really is.
+An option will be added soon in order to allow specifying source folders to include in the total coverage computation.
+
+## Expression level coverage
+
+Even though hpc supports expression level covereage, this version of codecov-haskell does not support it yet, but this feature will be implemented soon.
+Meanwhile, the hpc coverage information is converted into a line based report, in which a line can be: fully covered (green), partially covered (yellow) and not covered (red).
 
 # Contributing
 
