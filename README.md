@@ -36,6 +36,7 @@ This will prevent the build to fail because of hpc related reasons, which are us
 You may also experience some issues related to your project dependencies, which can be solved by using the `--avoid-reinstalls`/`--force-reinstalls` flags.</br>
 Another way to solve problems related dependencies is to install codecov-haskell in a sandbox, as in the example below:
 ```yaml
+after_script:
   - cabal sandbox init && cabal install codecov-haskell
   - .cabal-sandbox/bin/codecov-haskell [options] [test-suite-names]
 ```
@@ -60,7 +61,7 @@ The `--cabal-name` option can be used to specify a custom executable name instea
 Below is an example which can be useful for projects with a Travis configuration based on [multi-ghc-travis](https://github.com/hvr/multi-ghc-travis):
 
 ```yaml
-run-cabal-test --cabal-name=cabal-1.18
+run-cabal-test --cabal-name=cabal-1.20
 ```
 
 ## The codecov-haskell command
@@ -89,6 +90,10 @@ You can specify multiple excluded folders by using the following example syntax:
 ```yaml
 codecov-haskell --exclude-dir=test1 --exclude-dir=test2 [test-suite-names]
 ```
+
+#### --display-report
+
+This boolean option prints the raw json coverage report to be sent to coveralls.io.
 
 #### --dont-send
 
