@@ -5,7 +5,7 @@ import           Control.Monad
 import           Data.Aeson
 import qualified Data.ByteString.Lazy.Char8 as BSL
 import           Data.List
-import           Data.Maybe
+import           Data.Maybe hiding (listToMaybe)
 import           CodecovHaskellCmdLine
 import           System.Console.CmdArgs
 import           System.Environment (getEnv, getEnvironment)
@@ -13,6 +13,7 @@ import           System.Exit (exitFailure, exitSuccess)
 import           Trace.Hpc.Codecov
 import           Trace.Hpc.Codecov.Config (Config(Config))
 import           Trace.Hpc.Codecov.Curl
+import           Trace.Hpc.Codecov.Util
 
 baseUrlApiV1 :: String
 baseUrlApiV1 = "https://codecov.io/upload/v1"
@@ -31,9 +32,7 @@ getUrlApiV1 = do
            ("TRAVIS", (("travis_job_id", "TRAVIS_JOB_ID"), "TRAVIS_COMMIT", "TRAVIS_BRANCH"))]
 
 getConfig :: CodecovHaskellArgs -> Maybe Config
-getConfig cha = case testSuites cha of
-    []             -> Nothing
-    testSuiteNames -> Just $ Config testSuiteNames (excludeDirs cha)
+getConfig cha = Config (excludeDirs cha) <$> listToMaybe (testSuites cha)
 
 main :: IO ()
 main = do
