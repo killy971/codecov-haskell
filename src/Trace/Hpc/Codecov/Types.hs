@@ -15,8 +15,8 @@ import Network.Curl
 import Trace.Hpc.Mix
 
 type CoverageEntry = (
-    MixEntry, -- mix entry
-    Integer,  -- tix value
+    [MixEntry], -- mix entries
+    [Integer],  -- tix values
     [String])   -- entry source code
 
 data Hit = Full

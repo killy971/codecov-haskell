@@ -13,6 +13,7 @@ module Trace.Hpc.Codecov ( generateCodecovFromTix ) where
 
 import           Data.Aeson
 import           Data.Aeson.Types ()
+import           Data.Function
 import           Data.List
 import qualified Data.Map.Strict as M
 import           System.Exit (exitFailure)
@@ -57,11 +58,17 @@ getExprSource source (hpcPos, _) = subSubSeq startCol endCol subLines
           startCol = startCol' - 1
           (startLine', startCol', endLine, endCol) = fromHpcPos hpcPos
 
+groupMixEntryTixs :: [(MixEntry, Integer, [String])] -> [CoverageEntry]
+groupMixEntryTixs = map mergeOnLst3 . groupBy ((==) `on` fst . fst3)
+    where mergeOnLst3 xxs@(x : _) = (map fst3 xxs, map snd3 xxs, trd3 x)
+          mergeOnLst3 [] = error "mergeOnLst3 appliedTo empty list"
+
 -- TODO possible renaming to "getModuleCoverage"
 coverageToJson :: LixConverter -> ModuleCoverageData -> SimpleCoverage
 coverageToJson converter (source, mix, tixs) = simpleCoverage
-    where simpleCoverage = toSimpleCoverage converter lineCount mixEntryTixs
+    where simpleCoverage = toSimpleCoverage converter lineCount mixEntriesTixs
           lineCount = length $ lines source
+          mixEntriesTixs = groupMixEntryTixs mixEntryTixs
           mixEntryTixs = zip3 mixEntries tixs (map getExprSource' mixEntries)
           Mix _ _ _ _ mixEntries = mix
           getExprSource' = getExprSource $ lines source
