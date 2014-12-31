@@ -12,7 +12,6 @@
 
 module Trace.Hpc.Codecov.Curl ( postJson, readCoverageResult, PostResult (..) ) where
 
-import           Control.Applicative
 import           Control.Monad
 import           Data.Aeson
 import           Data.Aeson.Types (parseMaybe)
@@ -47,7 +46,9 @@ postJson jsonCoverage url printResponse = do
     return $ parseResponse r
 
 extractCoverage :: String -> Maybe String
-extractCoverage rBody = (++ "%") . show <$> (getField "coverage" :: Maybe Integer)
+extractCoverage rBody = case getField "coverage" :: Maybe Integer of
+    Just coverage -> Just $ show coverage ++ "%"
+    Nothing -> Just $ "Failure. Response body: " ++ rBody
     where getField fieldName = do
               result <- decode $ LBS.pack rBody
               parseMaybe (.: fieldName) result
