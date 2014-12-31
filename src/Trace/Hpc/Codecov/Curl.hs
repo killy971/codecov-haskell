@@ -61,7 +61,7 @@ readCoverageResult url printResponse = do
     when printResponse $ putStrLn $ snd response
     return $ case response of
         (CurlOK, body) -> extractCoverage body
-        _ -> Nothing
+        _ -> Just "Erroneous Curl return code"
     where curlOptions = [
               CurlTimeout 60,
               CurlConnectTimeout 60]
