@@ -29,5 +29,5 @@ type Lix = [Hit]
 
 -- | Result to the POST request to codecov.io
 data PostResult =
-    PostSuccess URLString String -- ^ Codecov job url and total coverage percentage
-  | PostFailure String           -- ^ error message
+    PostSuccess URLString URLString -- ^ Codecov job url and wait url
+  | PostFailure String              -- ^ error message

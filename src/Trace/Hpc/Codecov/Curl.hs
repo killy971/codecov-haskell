@@ -10,8 +10,9 @@
 --
 -- Functions for sending coverage report files over http.
 
-module Trace.Hpc.Codecov.Curl ( postJson, PostResult (..) ) where
+module Trace.Hpc.Codecov.Curl ( postJson, readCoverageResult, PostResult (..) ) where
 
+import           Control.Applicative
 import           Control.Monad
 import           Data.Aeson
 import           Data.Aeson.Types (parseMaybe)
@@ -22,7 +23,7 @@ import           Trace.Hpc.Codecov.Types
 
 parseResponse :: CurlResponse -> PostResult
 parseResponse r = case respCurlCode r of
-    CurlOK -> PostSuccess (getField "url") (show (getField "coverage" :: Integer) ++ "%")
+    CurlOK -> PostSuccess (getField "url") (getField "wait_url")
     _      -> PostFailure $ getField "message"
     where getField fieldName = fromJust $ mGetField fieldName
           mGetField fieldName = do
@@ -44,3 +45,24 @@ postJson jsonCoverage url printResponse = do
     r <- perform_with_response_ h
     when printResponse $ putStrLn $ respBody r
     return $ parseResponse r
+
+extractCoverage :: String -> Maybe String
+extractCoverage rBody = (++ "%") . show <$> (getField "coverage" :: Maybe Integer)
+    where getField fieldName = fromJust $ mGetField fieldName
+          mGetField fieldName = do
+              result <- decode $ LBS.pack rBody
+              parseMaybe (.: fieldName) result
+
+-- | Read the coveraege result page from coveralls.io
+readCoverageResult :: URLString         -- ^ target url
+                   -> Bool              -- ^ print json response if true
+                   -> IO (Maybe String) -- ^ coverage result
+readCoverageResult url printResponse = do
+    response <- curlGetString url curlOptions
+    when printResponse $ putStrLn $ snd response
+    return $ case response of
+        (CurlOK, body) -> extractCoverage body
+        _ -> Nothing
+    where curlOptions = [
+              CurlTimeout 60,
+              CurlConnectTimeout 60]

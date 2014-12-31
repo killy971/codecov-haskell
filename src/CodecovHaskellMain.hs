@@ -1,6 +1,7 @@
 module Main where
 
 import           Control.Applicative
+import           Control.Concurrent
 import           Control.Monad
 import           Data.Aeson
 import qualified Data.ByteString.Lazy.Char8 as BSL
@@ -46,7 +47,12 @@ main = do
                 apiUrl <- getUrlApiV1
                 response <- postJson (BSL.unpack $ encode codecovJson) apiUrl (printResponse cha)
                 case response of
-                    PostSuccess url totalCoverage -> do
+                    PostSuccess url waitUrl -> do
                         putStrLn ("URL: " ++ url)
-                        putStrLn ("Coverage: " ++ totalCoverage)
+                        -- wait 10 seconds until the page is available
+                        threadDelay (10 * 1000000)
+                        coverageResult <- readCoverageResult waitUrl (printResponse cha)
+                        case coverageResult of
+                            Just totalCoverage -> putStrLn ("Coverage: " ++ totalCoverage) >> exitSuccess
+                            Nothing -> putStrLn "Failed to read total coverage" >> exitSuccess
                     PostFailure msg -> putStrLn ("Error: " ++ msg) >> exitFailure
