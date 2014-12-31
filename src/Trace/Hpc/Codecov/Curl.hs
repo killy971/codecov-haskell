@@ -48,8 +48,7 @@ postJson jsonCoverage url printResponse = do
 
 extractCoverage :: String -> Maybe String
 extractCoverage rBody = (++ "%") . show <$> (getField "coverage" :: Maybe Integer)
-    where getField fieldName = fromJust $ mGetField fieldName
-          mGetField fieldName = do
+    where getField fieldName = do
               result <- decode $ LBS.pack rBody
               parseMaybe (.: fieldName) result
 
