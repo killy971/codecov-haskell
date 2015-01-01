@@ -1,3 +1,7 @@
++[0.3.0](https://github.com/guillaume-nargeot/codcov-haskell/issues?q=milestone:v0.3.0+is:closed)
+-----
+* Fix coverage result response reading (issue #5)
+
 +[0.2.0](https://github.com/guillaume-nargeot/codcov-haskell/issues?q=milestone:v0.2.0+is:closed)
 -----
 * Fix coverage conversion rule for otherwise bug (issue #4)
