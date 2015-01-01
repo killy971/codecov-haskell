@@ -66,4 +66,5 @@ readCoverageResult url printResponse = do
     where curlOptions = [
               CurlTimeout 60,
               CurlConnectTimeout 60,
-              CurlVerbose True]
+              CurlVerbose True,
+              CurlFollowLocation True]
