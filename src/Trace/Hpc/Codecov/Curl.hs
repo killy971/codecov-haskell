@@ -65,4 +65,5 @@ readCoverageResult url printResponse = do
         _ -> Just "Erroneous Curl return code"
     where curlOptions = [
               CurlTimeout 60,
-              CurlConnectTimeout 60]
+              CurlConnectTimeout 60,
+              CurlVerbose True]
