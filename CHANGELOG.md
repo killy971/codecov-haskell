@@ -1,3 +1,7 @@
++[0.4.0](https://github.com/guillaume-nargeot/codcov-haskell/issues?q=milestone:v0.4.0+is:closed)
+-----
+* Introduce retry policy to http requests (issue #6)
+
 +[0.3.0](https://github.com/guillaume-nargeot/codcov-haskell/issues?q=milestone:v0.3.0+is:closed)
 -----
 * Fix coverage result response reading (issue #5)
