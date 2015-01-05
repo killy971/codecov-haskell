@@ -49,7 +49,7 @@ postJson jsonCoverage url printResponse = do
 
 -- | Exponential retry policy of 10 seconds initial delay, up to 5 times
 expRetryPolicy :: RetryPolicy
-expRetryPolicy = exponentialBackoff (10 * 1000 * 1000) <> limitRetries 5
+expRetryPolicy = exponentialBackoff (10 * 1000 * 1000) <> limitRetries 3
 
 performWithRetry :: IO (Maybe a) -> IO (Maybe a)
 performWithRetry = retrying expRetryPolicy isNothingM
