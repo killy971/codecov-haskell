@@ -13,6 +13,8 @@ codecov-haskell is still under development and any contributions are welcome!
 
 Below is the simplest example of configuration for your project `.travis.yml`:
 ```yaml
+language: haskell
+ghc: 7.8
 script:
   - cabal configure --enable-tests --enable-library-coverage && cabal build && cabal test
 after_script:
