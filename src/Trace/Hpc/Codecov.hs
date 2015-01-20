@@ -46,7 +46,7 @@ getExprSource source (hpcPos, _) = subSubSeq startCol endCol subLines
 
 groupMixEntryTixs :: [(MixEntry, Integer, [String])] -> [CoverageEntry]
 groupMixEntryTixs = map mergeOnLst3 . groupBy ((==) `on` fst . fst3)
-    where mergeOnLst3 xxs@(x : _) = (map fst3 xxs, map snd3 xxs, trd3 x)
+    where mergeOnLst3 xxs@(x : _) = (fst $ fst3 x, (map (snd . fst3) xxs, map snd3 xxs, trd3 x))
           mergeOnLst3 [] = error "mergeOnLst3 appliedTo empty list"
 
 -- TODO possible renaming to "getModuleCoverage"

@@ -12,6 +12,7 @@ module Trace.Hpc.Codecov.Types where
 import Data.Aeson
 import Network.Curl
 import Trace.Hpc.Mix
+import Trace.Hpc.Util
 
 -- single file coverage data in the format defined by codecov.io
 type SimpleCoverage = [Value]
@@ -19,9 +20,10 @@ type SimpleCoverage = [Value]
 type LixConverter = Lix -> SimpleCoverage
 
 type CoverageEntry = (
-    [MixEntry], -- mix entries
-    [Integer],  -- tix values
-    [String])   -- entry source code
+    HpcPos,      -- position
+    ([BoxLabel], -- box labels
+     [Integer],  -- tix values
+     [String]))  -- entry source code
 
 data Hit = Full
          | Partial

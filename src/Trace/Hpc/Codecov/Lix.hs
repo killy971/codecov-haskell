@@ -27,23 +27,22 @@ toHit xs
     | otherwise = None
 
 toExprHit :: CoverageEntry -> (Int, ExprHit)
-toExprHit (entries, counts, _) = (line - 1, (hit, (start, end)))
-    where (line, start, _, end) = fromHpcPos $ fst $ head entries
+toExprHit (pos, (_, counts, _)) = (line - 1, (hit, (start, end)))
+    where (line, start, _, end) = fromHpcPos pos
           hit = toHit $ map (> 0) counts
 
 isOtherwiseEntry :: CoverageEntry -> Bool
-isOtherwiseEntry (mixEntries, _, source) =
+isOtherwiseEntry (_, (boxLabels, _, source)) =
     source == ["otherwise"] && boxLabels == otherwiseBoxLabels
-    where boxLabels = map snd mixEntries
-          otherwiseBoxLabels = [
-              ExpBox False,
-              BinBox GuardBinBox True,
-              BinBox GuardBinBox False]
+        where otherwiseBoxLabels = [
+               ExpBox False,
+               BinBox GuardBinBox True,
+               BinBox GuardBinBox False]
 
 adjust :: CoverageEntry -> CoverageEntry
-adjust coverageEntry@(mixEntries, tixs, source) =
+adjust coverageEntry@(pos, (boxLabels, tixs, source)) =
     if isOtherwiseEntry coverageEntry && any (> 0) tixs
-    then (mixEntries, [1, 1, 1], source)
+    then (pos, (boxLabels, [1, 1, 1], source))
     else coverageEntry
 
 -- | Convert hpc coverage entries into a line based coverage format
