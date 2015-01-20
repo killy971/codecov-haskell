@@ -2,7 +2,7 @@
 
 -- |
 -- Module:      Trace.Hpc.Codecov
--- Copyright:   (c) 2014 Guillaume Nargeot
+-- Copyright:   (c) 2014-2015 Guillaume Nargeot
 -- License:     BSD3
 -- Maintainer:  Guillaume Nargeot <guillaume+hackage@nargeot.com>
 -- Stability:   experimental
@@ -18,6 +18,7 @@ import           Data.List
 import qualified Data.Map.Strict as M
 import           System.Exit (exitFailure)
 import           Trace.Hpc.Codecov.Config
+import           Trace.Hpc.Codecov.Json
 import           Trace.Hpc.Codecov.Lix
 import           Trace.Hpc.Codecov.Paths
 import           Trace.Hpc.Codecov.Types
@@ -32,21 +33,6 @@ type ModuleCoverageData = (
     [Integer]) -- tixs recorded by hpc
 
 type TestSuiteCoverageData = M.Map FilePath ModuleCoverageData
-
--- single file coverage data in the format defined by codecov.io
-type SimpleCoverage = [CoverageValue]
-
--- Is there a way to restrict this to only Number and Null?
-type CoverageValue = Value
-
-type LixConverter = Lix -> SimpleCoverage
-
-defaultConverter :: LixConverter
-defaultConverter = map $ \lix -> case lix of
-    Full       -> Number 1
-    Partial    -> Bool True
-    None       -> Number 0
-    Irrelevant -> Null
 
 toSimpleCoverage :: LixConverter -> Int -> [CoverageEntry] -> SimpleCoverage
 toSimpleCoverage convert lineCount = (:) Null . convert . toLix lineCount

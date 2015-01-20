@@ -44,6 +44,7 @@ library
   hs-source-dirs: src
   exposed-modules:
     Trace.Hpc.Codecov,
+    Trace.Hpc.Codecov.Json,
     Trace.Hpc.Codecov.Lix,
     Trace.Hpc.Codecov.Types,
     Trace.Hpc.Codecov.Util
@@ -62,7 +63,8 @@ library
     hpc >= 0.6,
     retry >= 0.5,
     safe >= 0.3,
-    split
+    split,
+    vector
 
 executable codecov-haskell
   hs-source-dirs: src
@@ -77,7 +79,8 @@ executable codecov-haskell
     hpc >= 0.6,
     retry >= 0.5,
     safe >= 0.3,
-    split
+    split,
+    vector
   ghc-options:    -Wall -fwarn-tabs -fwarn-incomplete-uni-patterns
 
 executable run-cabal-test

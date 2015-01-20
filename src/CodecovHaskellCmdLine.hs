@@ -26,6 +26,6 @@ codecovHaskellArgs = CmdMain
     , printResponse = False   &= explicit               &= name "print-response" &= help "Prints the json reponse received from codecov.io"
     , dontSend      = False   &= explicit               &= name "dont-send"      &= help "Do not send the report to codecov.io"
     , testSuites    = []      &= typ "TEST-SUITE" &= args
-    } &= summary ("codecov-haskell-" ++ versionString version ++ ", (C) Guillaume Nargeot 2014")
+    } &= summary ("codecov-haskell-" ++ versionString version ++ ", (C) Guillaume Nargeot 2014-2015")
       &= program "codecov-haskell"
     where versionString = intercalate "." . map show . versionBranch

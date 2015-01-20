@@ -1,6 +1,6 @@
 -- |
 -- Module:      Trace.Hpc.Codecov.Types
--- Copyright:   (c) 2014 Guillaume Nargeot
+-- Copyright:   (c) 2014-2015 Guillaume Nargeot
 -- License:     BSD3
 -- Maintainer:  Guillaume Nargeot <guillaume+hackage@nargeot.com>
 -- Stability:   experimental
@@ -9,8 +9,14 @@
 
 module Trace.Hpc.Codecov.Types where
 
+import Data.Aeson
 import Network.Curl
 import Trace.Hpc.Mix
+
+-- single file coverage data in the format defined by codecov.io
+type SimpleCoverage = [Value]
+
+type LixConverter = Lix -> SimpleCoverage
 
 type CoverageEntry = (
     [MixEntry], -- mix entries
@@ -23,7 +29,9 @@ data Hit = Full
          | Irrelevant
     deriving (Eq, Show)
 
-type Lix = [Hit]
+type ExprHit = (Hit, (Int, Int))
+
+type Lix = [Maybe [ExprHit]]
 
 -- | Result to the POST request to codecov.io
 data PostResult =

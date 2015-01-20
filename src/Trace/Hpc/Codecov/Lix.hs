@@ -1,6 +1,6 @@
 -- |
 -- Module:      Trace.Hpc.Codecov.Lix
--- Copyright:   (c) 2014 Guillaume Nargeot
+-- Copyright:   (c) 2014-2015 Guillaume Nargeot
 -- License:     BSD3
 -- Maintainer:  Guillaume Nargeot <guillaume+hackage@nargeot.com>
 -- Stability:   experimental
@@ -12,7 +12,7 @@ module Trace.Hpc.Codecov.Lix where
 
 import Data.List
 import Data.Ord
-import Prelude hiding (getLine)
+import Prelude
 import Trace.Hpc.Codecov.Types
 import Trace.Hpc.Codecov.Util
 import Trace.Hpc.Mix
@@ -26,12 +26,10 @@ toHit xs
     | or xs     = Partial
     | otherwise = None
 
-getLine :: MixEntry -> Int
-getLine = fffst . fromHpcPos . fst
-    where fffst (x, _, _, _) = x
-
-toLineHit :: CoverageEntry -> (Int, Bool)
-toLineHit (entries, counts, _source) = (getLine (head entries) - 1, all (> 0) counts)
+toExprHit :: CoverageEntry -> (Int, ExprHit)
+toExprHit (entries, counts, _) = (line - 1, (hit, (start, end)))
+    where (line, start, _, end) = fromHpcPos $ fst $ head entries
+          hit = toHit $ map (> 0) counts
 
 isOtherwiseEntry :: CoverageEntry -> Bool
 isOtherwiseEntry (mixEntries, _, source) =
@@ -50,8 +48,8 @@ adjust coverageEntry@(mixEntries, tixs, source) =
 
 -- | Convert hpc coverage entries into a line based coverage format
 toLix :: Int             -- ^ Source line count
-      -> [CoverageEntry] -- ^ Mix entries and associated hit count
+      -> [CoverageEntry] -- ^ Coverage entries
       -> Lix             -- ^ Line coverage
-toLix lineCount entries = map toHit (groupByIndex lineCount sortedLineHits)
-    where sortedLineHits = sortBy (comparing fst) lineHits
-          lineHits = map (toLineHit . adjust) entries
+toLix lineCount entries = map listToMaybe (groupByIndex lineCount sortedExprHits)
+    where sortedExprHits = sortBy (comparing fst) exprHits
+          exprHits = map (toExprHit . adjust) entries
