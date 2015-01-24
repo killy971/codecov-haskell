@@ -39,6 +39,15 @@ isOtherwiseEntry (_, (boxLabels, _, source)) =
                BinBox GuardBinBox True,
                BinBox GuardBinBox False]
 
+-- | Adjust the HpcPos of coverage entries so that they don't overlap
+unnest :: [CoverageEntry] -> [CoverageEntry]
+unnest = id
+
+-- | In case the input coverage entry covers multiple lines of code,
+--   split it into multiple coverage entries each covering a single line
+splitMultiLine :: CoverageEntry -> [CoverageEntry]
+splitMultiLine coverageEntry = [coverageEntry]
+
 adjust :: CoverageEntry -> CoverageEntry
 adjust coverageEntry@(pos, (boxLabels, tixs, source)) =
     if isOtherwiseEntry coverageEntry && any (> 0) tixs
@@ -51,4 +60,5 @@ toLix :: Int             -- ^ Source line count
       -> Lix             -- ^ Line coverage
 toLix lineCount entries = map listToMaybe (groupByIndex lineCount sortedExprHits)
     where sortedExprHits = sortBy (comparing fst) exprHits
-          exprHits = map (toExprHit . adjust) entries
+          exprHits = (map toExprHit . unnest . concatMap splitMultiLine . map adjust) entries
+          -- exprHits = map toExprHit . unnest . map adjust entries
