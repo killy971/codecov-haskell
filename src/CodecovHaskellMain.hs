@@ -48,16 +48,15 @@ main = do
     case getConfig cha of
         Nothing -> putStrLn "Please specify a target test suite name" >> exitSuccess
         Just config -> do
-            let apiToken = (token cha)
             codecovJson <- generateCodecovFromTix config
             when (displayReport cha) $ BSL.putStrLn $ encode codecovJson
             unless (dontSend cha) $ do
                 apiUrl <- getUrlApiV1
-                fullUrl <- getUrlWithToken apiUrl "token" apiToken
+                fullUrl <- getUrlWithToken apiUrl "token" (token cha)
                 response <- postJson (BSL.unpack $ encode codecovJson) fullUrl (printResponse cha)
                 case response of
                     PostSuccess url _ -> do
-                        responseUrl <- getUrlWithToken url "access_token" apiToken
+                        responseUrl <- getUrlWithToken url "access_token" (accessToken cha)
                         putStrLn ("URL: " ++ responseUrl)
                         -- wait 10 seconds until the page is available
                         threadDelay (10 * 1000000)
