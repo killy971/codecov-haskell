@@ -36,7 +36,7 @@ getUrlApiV1 = do
            ("JENKINS_HOME", (("travis_job_id", "BUILD_NUMBER"), "GIT_COMMIT", "GIT_BRANCH"))]
 
 getUrlWithToken :: String -> String -> Maybe String -> IO String
-getUrlWithToken apiUrl _ Nothing = return $ apiUrl
+getUrlWithToken apiUrl _ Nothing = return apiUrl
 getUrlWithToken apiUrl param (Just t) = return $ apiUrl ++ "&" ++ param ++ "=" ++ t
 
 getConfig :: CodecovHaskellArgs -> Maybe Config
