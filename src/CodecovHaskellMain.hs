@@ -19,6 +19,8 @@ import           Trace.Hpc.Codecov.Util
 baseUrlApiV1 :: String
 baseUrlApiV1 = "https://codecov.io/upload/v1"
 
+
+
 getUrlApiV1 :: IO String
 getUrlApiV1 = do
     env <- getEnvironment
@@ -30,7 +32,12 @@ getUrlApiV1 = do
             return $ baseUrlApiV1 ++ "?" ++ idParamName ++ "=" ++ idParamValue ++ "&commit=" ++ commit ++ "&branch=" ++ branch
         _ -> error "Unsupported CI service."
     where ciEnvVars = [
-           ("TRAVIS", (("travis_job_id", "TRAVIS_JOB_ID"), "TRAVIS_COMMIT", "TRAVIS_BRANCH"))]
+           ("TRAVIS", (("travis_job_id", "TRAVIS_JOB_ID"), "TRAVIS_COMMIT", "TRAVIS_BRANCH")),
+           ("JENKINS_HOME", (("travis_job_id", "BUILD_NUMBER"), "GIT_COMMIT", "GIT_BRANCH"))]
+
+getUrlWithToken :: String -> String -> Maybe String -> IO String
+getUrlWithToken apiUrl _ Nothing = return apiUrl
+getUrlWithToken apiUrl param (Just t) = return $ apiUrl ++ "&" ++ param ++ "=" ++ t
 
 getConfig :: CodecovHaskellArgs -> Maybe Config
 getConfig cha = Config (excludeDirs cha) <$> listToMaybe (testSuites cha)
@@ -45,13 +52,15 @@ main = do
             when (displayReport cha) $ BSL.putStrLn $ encode codecovJson
             unless (dontSend cha) $ do
                 apiUrl <- getUrlApiV1
-                response <- postJson (BSL.unpack $ encode codecovJson) apiUrl (printResponse cha)
+                fullUrl <- getUrlWithToken apiUrl "token" (token cha)
+                response <- postJson (BSL.unpack $ encode codecovJson) fullUrl (printResponse cha)
                 case response of
-                    PostSuccess url waitUrl -> do
-                        putStrLn ("URL: " ++ url)
+                    PostSuccess url _ -> do
+                        responseUrl <- getUrlWithToken url "access_token" (accessToken cha)
+                        putStrLn ("URL: " ++ responseUrl)
                         -- wait 10 seconds until the page is available
                         threadDelay (10 * 1000000)
-                        coverageResult <- readCoverageResult waitUrl (printResponse cha)
+                        coverageResult <- readCoverageResult responseUrl (printResponse cha)
                         case coverageResult of
                             Just totalCoverage -> putStrLn ("Coverage: " ++ totalCoverage) >> exitSuccess
                             Nothing -> putStrLn "Failed to read total coverage" >> exitSuccess
