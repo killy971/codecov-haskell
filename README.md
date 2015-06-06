@@ -3,7 +3,8 @@ codecov-haskell [![Build Status](http://img.shields.io/travis/guillaume-nargeot/
 
 codecov-haskell converts and sends Haskell projects hpc code coverage to [codecov.io](http://codecov.io/).
 
-At the moment, only [Travis CI](http://travis-ci.org) has been tested, but codecov-haskell should be compatible with other CI services in the near future.
+At the moment, [Travis CI](https://travis-ci.org), [Circle CI](https://circleci.com) and [Jenkins CI](https://jenkins-ci.org) have been tested,
+but codecov-haskell should be compatible with other CI services in the near future.
 
 codecov-haskell is still under development and any contributions are welcome!
 
@@ -39,6 +40,50 @@ Another way to solve problems related dependencies is to install codecov-haskell
 after_script:
   - cabal sandbox init && cabal install codecov-haskell
   - .cabal-sandbox/bin/codecov-haskell [options] [test-suite-names]
+```
+
+## Circle CI
+
+In your test section of your `circle.yml` add the following:
+```yaml
+test:
+  pre:
+    - cabal install codecov-haskell
+    - cabal configure --enable-tests --enable-library-coverage
+    - cabal build
+  override:
+    - cabal test
+  post:
+    - codecov-haskell [options] [test-suite-names]
+```
+
+If your build fails during the test phase with an error message starting by "hpc:", just replace the `cabal test` command by `run-cabal-test`, as in the following example:
+```yaml
+test:
+  pre:
+    - cabal install codecov-haskell
+    - cabal configure --enable-tests --enable-library-coverage
+    - cabal build
+  override:
+    - run-cabal-test
+  post:
+    - codecov-haskell [options] [test-suite-names]
+```
+    
+## Jenkins CI
+In your build script add the following commands:
+```bash
+cabal install codecov-haskell
+cabal configure --enable-tests --enable-library-coverage && cabal build && cabal test
+codecov-haskell [options] [test-suite-names]
+```
+
+If your build fails during the test phase with an error message starting by "hpc:", just replace the `cabal test` command by `run-cabal-test`, as in the following example:
+```bash
+cabal install codecov-haskell
+cabal configure --enable-tests --enable-library-coverage && cabal build
+run-cabal-test [options] [cabal-test-options]
+codecov-haskell [options] [test-suite-names]
 ```
 
 ## The run-cabal-test command
