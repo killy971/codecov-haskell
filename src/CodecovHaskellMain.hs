@@ -16,24 +16,23 @@ import           Trace.Hpc.Codecov.Config (Config(Config))
 import           Trace.Hpc.Codecov.Curl
 import           Trace.Hpc.Codecov.Util
 
-baseUrlApiV1 :: String
-baseUrlApiV1 = "https://codecov.io/upload/v1"
+baseUrlApiV2 :: String
+baseUrlApiV2 = "https://codecov.io/upload/v2"
 
-
-
-getUrlApiV1 :: IO String
-getUrlApiV1 = do
+getUrlApiV2 :: IO String
+getUrlApiV2 = do
     env <- getEnvironment
     case snd <$> find (isJust . flip lookup env . fst) ciEnvVars of
         Just ((idParamName, idParamEnvVar), commitEnvVar, branchEnvVar) -> do
             idParamValue <- getEnv idParamEnvVar
             commit <- getEnv commitEnvVar
             branch <- getEnv branchEnvVar
-            return $ baseUrlApiV1 ++ "?" ++ idParamName ++ "=" ++ idParamValue ++ "&commit=" ++ commit ++ "&branch=" ++ branch
+            return $ baseUrlApiV2 ++ "?" ++ idParamName ++ "=" ++ idParamValue ++ "&commit=" ++ commit ++ "&branch=" ++ branch
         _ -> error "Unsupported CI service."
     where ciEnvVars = [
-           ("TRAVIS", (("travis_job_id", "TRAVIS_JOB_ID"), "TRAVIS_COMMIT", "TRAVIS_BRANCH")),
-           ("JENKINS_HOME", (("travis_job_id", "BUILD_NUMBER"), "GIT_COMMIT", "GIT_BRANCH"))]
+           ("TRAVIS", (("job", "TRAVIS_JOB_ID"), "TRAVIS_COMMIT", "TRAVIS_BRANCH")),
+           ("JENKINS_HOME", (("job", "BUILD_NUMBER"), "GIT_COMMIT", "GIT_BRANCH")),
+           ("CIRCLECI", (("job", "CIRCLE_BUILD_NUM"), "CIRCLE_SHA1", "CIRCLE_BRANCH"))]
 
 getUrlWithToken :: String -> String -> Maybe String -> IO String
 getUrlWithToken apiUrl _ Nothing = return apiUrl
@@ -51,7 +50,7 @@ main = do
             codecovJson <- generateCodecovFromTix config
             when (displayReport cha) $ BSL.putStrLn $ encode codecovJson
             unless (dontSend cha) $ do
-                apiUrl <- getUrlApiV1
+                apiUrl <- getUrlApiV2
                 fullUrl <- getUrlWithToken apiUrl "token" (token cha)
                 response <- postJson (BSL.unpack $ encode codecovJson) fullUrl (printResponse cha)
                 case response of
