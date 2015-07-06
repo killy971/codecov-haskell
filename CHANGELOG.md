@@ -1,4 +1,4 @@
-+[0.4.0](https://github.com/guillaume-nargeot/codcov-haskell/issues?q=milestone:v0.4.0+is:closed)
++[0.4.0.2](https://github.com/guillaume-nargeot/codcov-haskell/issues?q=milestone:v0.4.0.2+is:closed)
 -----
 * Introduce retry policy to http requests (issue #6)
 * Add support for Jenkins-CI (issue #7)
