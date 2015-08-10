@@ -138,7 +138,7 @@ codecov-haskell --exclude-dir=test1 --exclude-dir=test2 [test-suite-names]
 
 #### --display-report
 
-This boolean option prints the raw json coverage report to be sent to coveralls.io.
+This boolean option prints the raw json coverage report to be sent to codecov.io.
 
 #### --dont-send
 
