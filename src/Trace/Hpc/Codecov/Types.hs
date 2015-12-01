@@ -1,5 +1,3 @@
-{-# LANGUAGE DeriveDataTypeable #-}
-
 -- |
 -- Module:      Trace.Hpc.Codecov.Types
 -- Copyright:   (c) 2014 Guillaume Nargeot

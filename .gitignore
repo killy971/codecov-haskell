@@ -5,3 +5,5 @@ dist/
 *.ps
 *.prof
 *.json
+.cabal-sandbox/
+cabal.sandbox.config
