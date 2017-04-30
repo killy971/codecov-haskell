@@ -1,6 +1,6 @@
 module Main where
 
-import           Control.Applicative()
+import           Control.Applicative
 import           Control.Concurrent
 import           Control.Monad
 import           Data.Aeson
