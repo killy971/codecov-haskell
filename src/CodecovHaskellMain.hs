@@ -13,6 +13,7 @@ import           System.Environment (getEnv, getEnvironment)
 import           System.Exit (exitFailure, exitSuccess)
 import           Trace.Hpc.Codecov
 import           Trace.Hpc.Codecov.Config (Config(Config))
+import qualified Trace.Hpc.Codecov.Config as Config
 import           Trace.Hpc.Codecov.Curl
 import           Trace.Hpc.Codecov.Util
 
@@ -39,7 +40,12 @@ getUrlWithToken apiUrl _ Nothing = return apiUrl
 getUrlWithToken apiUrl param (Just t) = return $ apiUrl ++ "&" ++ param ++ "=" ++ t
 
 getConfig :: CodecovHaskellArgs -> Maybe Config
-getConfig cha = Config (excludeDirs cha) <$> listToMaybe (testSuites cha)
+getConfig cha = do _testSuites <- listToMaybe (testSuites cha)
+                   return Config { Config.excludedDirs = excludeDirs cha
+                                 , Config.testSuites   = _testSuites
+                                 , Config.tixDir       = tixDir cha
+                                 , Config.mixDir       = mixDir cha
+                                 }
 
 main :: IO ()
 main = do

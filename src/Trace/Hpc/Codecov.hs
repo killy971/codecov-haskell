@@ -85,20 +85,21 @@ mergeModuleCoverageData (source, mix, tixs1) (_, _, tixs2) =
 mergeCoverageData :: [TestSuiteCoverageData] -> TestSuiteCoverageData
 mergeCoverageData = foldr1 (M.unionWith mergeModuleCoverageData)
 
-readMix' :: String -> TixModule -> IO Mix
-readMix' name tix = readMix [getMixPath name tix] (Right tix)
+readMix' :: Config -> String -> TixModule -> IO Mix
+readMix' config name tix = readMix (getMixPaths config name tix) $ Right tix
 
 -- | Create a list of coverage data from the tix input
-readCoverageData :: String                   -- ^ test suite name
+readCoverageData :: Config                   -- ^ codecov-haskell configuration 
+                 -> String                   -- ^ test suite name
                  -> [String]                 -- ^ excluded source folders
                  -> IO TestSuiteCoverageData -- ^ coverage data list
-readCoverageData testSuiteName excludeDirPatterns = do
-    tixPath <- getTixPath testSuiteName
+readCoverageData config testSuiteName excludeDirPatterns = do
+    tixPath <- getTixPath config testSuiteName
     mtix <- readTix tixPath
     case mtix of
         Nothing -> error ("Couldn't find the file " ++ tixPath) >> exitFailure
         Just (Tix tixs) -> do
-            mixs <- mapM (readMix' testSuiteName) tixs
+            mixs <- mapM (readMix' config testSuiteName) tixs
             let files = map filePath mixs
             sources <- mapM readFile files
             let coverageDataList = zip4 files sources mixs (map tixModuleTixs tixs)
@@ -111,7 +112,7 @@ readCoverageData testSuiteName excludeDirPatterns = do
 generateCodecovFromTix :: Config   -- ^ codecov-haskell configuration
                        -> IO Value -- ^ code coverage result in json format
 generateCodecovFromTix config = do
-    testSuitesCoverages <- mapM (`readCoverageData` excludedDirPatterns) testSuiteNames
+    testSuitesCoverages <- mapM (flip (readCoverageData config) excludedDirPatterns) testSuiteNames
     return $ toCodecovJson converter $ mergeCoverageData testSuitesCoverages
     where excludedDirPatterns = excludedDirs config
           testSuiteNames = testSuites config
