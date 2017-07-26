@@ -19,6 +19,7 @@ import           Data.Aeson
 import           Data.Aeson.Types (parseMaybe)
 import qualified Data.ByteString.Lazy.Char8 as LBS
 import           Data.Maybe
+import           Data.Monoid
 import           Network.Curl
 import           Trace.Hpc.Codecov.Types
 
@@ -52,8 +53,9 @@ expRetryPolicy :: RetryPolicy
 expRetryPolicy = exponentialBackoff (10 * 1000 * 1000) <> limitRetries 3
 
 performWithRetry :: IO (Maybe a) -> IO (Maybe a)
-performWithRetry = retrying expRetryPolicy isNothingM
+performWithRetry action = retrying expRetryPolicy isNothingM action'
     where isNothingM _ = return . isNothing
+          action' _ = action
 
 extractCoverage :: String -> Maybe String
 extractCoverage rBody = (++ "%") . show <$> (getField "coverage" :: Maybe Integer)
